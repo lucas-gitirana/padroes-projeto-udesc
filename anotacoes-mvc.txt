@@ -1,0 +1,5 @@
+view 
+-> quando acontece um evento, chama método do controller diretamente
+-> só recebe "retorno" do controller pelos métodos do observer (interface)
+
+métodos do controller SÃO SEMPRE VOID (quando se referem a eventos dos botões)
