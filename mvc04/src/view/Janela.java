@@ -7,8 +7,6 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -22,11 +20,13 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import controle.Observador;
+import controle.PedidoController;
 import model.Pedido;
 import model.Produto;
 
 @SuppressWarnings("serial")
-public class Janela extends JFrame {
+public class Janela extends JFrame implements Observador{
 
 	private JButton jbNovo;
 
@@ -44,11 +44,10 @@ public class Janela extends JFrame {
 
 	private JTable jtItens;
 
-	private int idxProduto;
-	private List<Produto> tabelaProdutos = new ArrayList<>();
-	private List<Pedido> tabelaPedidos = new ArrayList<>();
-
 	private ItensTableModel itModel;
+	
+	// Controlador de pedidos
+	private PedidoController pedidoController;
 
 	class ItensTableModel extends AbstractTableModel {
 
@@ -68,24 +67,19 @@ public class Janela extends JFrame {
 		
 		@Override
 		public int getRowCount() {
-			return tabelaPedidos.size() + 1;
+			return pedidoController.getTabelaPedidos().size() + 1;
 		}
 
 		@Override
 		public Object getValueAt(int rowIndex, int colIndex) {
-			if (rowIndex == tabelaPedidos.size()) {
+			if (rowIndex == pedidoController.getTabelaPedidos().size()) {
 				if (colIndex == 2) {
-					double total = 0;
-					for (Pedido ped : tabelaPedidos) {
-						total += ped.getPcoTotal();
-					}
-					return total;
-
+					return pedidoController.calculaTotalPedido();
 				} else {
 					return null;
 				}
 			} else {
-				Pedido p = tabelaPedidos.get(rowIndex);
+				Pedido p = pedidoController.getTabelaPedidos().get(rowIndex);
 				switch (colIndex) {
 				case 0:
 					return p.getProduto().getNome();
@@ -124,7 +118,7 @@ public class Janela extends JFrame {
 			// Cells are by default rendered as a JLabel.
 			JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
 
-			if (row == tabelaPedidos.size()) {
+			if (row == pedidoController.getTabelaPedidos().size()) {
 				l.setFont(new Font(l.getFont().getFontName(), Font.BOLD, l.getFont().getSize()));
 			}
 			return l;
@@ -133,16 +127,16 @@ public class Janela extends JFrame {
 	}
 
 	public Janela() {
+		
+		// Registramos a janela como observador do controller
+		pedidoController = new PedidoController();
+		pedidoController.addObservador(this);
+		
 		setTitle("Prova 1 55PPR");
 		setSize(400, 300);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		setResizable(false);
-
-		tabelaProdutos.add(new Produto("cal\u00E7a", 83));
-		tabelaProdutos.add(new Produto("camisa", 57));
-		tabelaProdutos.add(new Produto("gravata", 15.7));
-		tabelaProdutos.add(new Produto("tenis", 235.8));
 
 		initComponents();
 		addEventos();
@@ -152,7 +146,6 @@ public class Janela extends JFrame {
 	}
 
 	private void habilitarComponentes(boolean valor) {
-		
 		jbNovo.setEnabled(!valor);
 		jbAnterior.setEnabled(valor);
 		jbPosterior.setEnabled(valor);
@@ -173,12 +166,10 @@ public class Janela extends JFrame {
 		nav.setLayout(new BorderLayout());
 		nav.setBorder(BorderFactory.createLineBorder(Color.black));
 
-		jpProdutos = new JPanel();
-		for (Produto p : tabelaProdutos) {
-			Icon icon = new ImageIcon("imagens/" + p.getNome() + ".png");
-			JLabel jl = new JLabel(icon);
-			jpProdutos.add(jl);
-		}
+		jpProdutos = new JPanel();		
+		
+		// Chamando controller para instanciar cada item de produto
+		pedidoController.carregaImagemProduto();
 
 		cardLayout = new CardLayout();
 		jpProdutos.setLayout(cardLayout);
@@ -222,7 +213,7 @@ public class Janela extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				habilitarComponentes(true);
+				pedidoController.novo();
 			}
 		});
 
@@ -230,10 +221,7 @@ public class Janela extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				cardLayout.previous(jpProdutos);
-				idxProduto = (idxProduto - 1);
-				if (idxProduto == -1)
-					idxProduto = tabelaProdutos.size() - 1;
+				pedidoController.anterior();
 			}
 		});
 
@@ -241,8 +229,7 @@ public class Janela extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				cardLayout.next(jpProdutos);
-				idxProduto = (idxProduto + 1) % tabelaProdutos.size();
+				pedidoController.posterior();
 			}
 		});
 
@@ -250,21 +237,7 @@ public class Janela extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				Produto prod = tabelaProdutos.get(idxProduto);
-				Pedido alvo = null;
-				for (Pedido ped : tabelaPedidos) {
-					if (ped.getProduto() == prod) {
-						alvo = ped;
-						break;
-					}
-				}
-				if (alvo == null) {
-					alvo = new Pedido(prod);
-					tabelaPedidos.add(alvo);
-				} else
-					alvo.addQtdade();
-
-				itModel.fireTableDataChanged();
+				pedidoController.adicionarProdutoPedido();
 			}
 		});
 
@@ -272,12 +245,7 @@ public class Janela extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				tabelaPedidos.clear();
-				itModel.fireTableDataChanged();
-				cardLayout.first(jpProdutos);
-				idxProduto = 0;
-
-				habilitarComponentes(false);
+				pedidoController.concluirPedido();
 			}
 		});
 	}
@@ -286,5 +254,39 @@ public class Janela extends JFrame {
 		Janela j = new Janela();
 		j.setVisible(true);
 	}
+	
+	@Override
+	public void novoPedido() {
+		habilitarComponentes(true);		
+	}
 
+	@Override
+	public void inicializaProduto(Produto p) {
+		Icon icon = new ImageIcon("imagens/" + p.getNome() + ".png");
+		JLabel jl = new JLabel(icon);
+		this.jpProdutos.add(jl);
+	}
+
+	@Override
+	public void anterior() {
+		cardLayout.previous(jpProdutos);
+	}
+
+	@Override
+	public void posterior() {
+		cardLayout.next(jpProdutos);
+	}
+
+	@Override
+	public void addProdutoPedido() {
+		itModel.fireTableDataChanged();
+	}
+
+	@Override
+	public void concluirPedido() {
+		itModel.fireTableDataChanged();
+		cardLayout.first(jpProdutos);
+		habilitarComponentes(false);
+	}
+	
 }
