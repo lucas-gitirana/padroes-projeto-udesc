@@ -13,8 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import controller.CardController;
-import controller.Observador;
 import model.Card;
 
 /**
@@ -23,7 +21,7 @@ import model.Card;
 
 // Adaptado de https://github.com/moon-tea/Memory/
 
-public class Memory extends JFrame implements Observador {
+public class Memory extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
@@ -35,60 +33,49 @@ public class Memory extends JFrame implements Observador {
 	private JLabel[][] imgLabel = new JLabel[ROWS][COLUMNS];
 	private JPanel[][] memPanel = new JPanel[ROWS][COLUMNS];
 
-	private Card[] cards = new Card[COLUMNS * ROWS]; // %
-	private int compareCards = 0; // %
-	private int holdCardRow = 0; // %
-	private int holdCardColumn = 0; // %
-	private boolean isFirst = true; // %
-	private int win = 0; // %
+	private Card[] cards = new Card[COLUMNS * ROWS];
+	private int compareCards = 0;
+	private int holdCardRow = 0;
+	private int holdCardColumn = 0;
+	private boolean isFirst = true;
+	private int win = 0;
 
 	private ImageIcon versoCarta;
-	
-	private CardController cardController;
 
 	public Memory() {
-		
-		//Instanciando controller e registrando observador
-		cardController = new CardController();
-		cardController.addObservador(this);		
-		
 		versoCarta = new ImageIcon("imagens/Card0.jpg");
 		
-//		Random rgen = new Random(); 
-//		int z = 1;
+		Random rgen = new Random(); 
+		int z = 1;
 		
-//		for (int i = 0; i < cards.length; i++) {
-//			cards[i] = new Card(-1, -1, z, false);
-//			if (i % 2 == 1) {
-//				z++;
-//			}
-//		}
-//		
-//		// --- embaralhar
-//		for (int i = 0; i < cards.length; i++) {
-//			int randomPosition = rgen.nextInt(cards.length);
-//			Card temp = cards[i];
-//
-//			cards[i] = cards[randomPosition];
-//			cards[i].setX(i / COLUMNS);
-//			cards[i].setY(i % COLUMNS);
-//
-//			cards[randomPosition] = temp;
-//
-//			temp.setX(randomPosition / COLUMNS);
-//			temp.setY(randomPosition % COLUMNS);
-//		}
+		for (int i = 0; i < cards.length; i++) {
+			cards[i] = new Card(-1, -1, z, false);
+			if (i % 2 == 1) {
+				z++;
+			}
+		}
+		
+		// --- embaralhar
+		for (int i = 0; i < cards.length; i++) {
+			int randomPosition = rgen.nextInt(cards.length);
+			Card temp = cards[i];
 
-		
-		cardController.embaralhar();
-		
-		
-//		for (int i = 0; i < ROWS; i++) {
-//			for (int j = 0; j < COLUMNS; j++) {
-//				buildMemPanel(i, j);
-//				add(memPanel[i][j]);
-//			}
-//		}
+			cards[i] = cards[randomPosition];
+			cards[i].setX(i / COLUMNS);
+			cards[i].setY(i % COLUMNS);
+
+			cards[randomPosition] = temp;
+
+			temp.setX(randomPosition / COLUMNS);
+			temp.setY(randomPosition % COLUMNS);
+		}
+
+		for (int i = 0; i < ROWS; i++) {
+			for (int j = 0; j < COLUMNS; j++) {
+				buildMemPanel(i, j);
+				add(memPanel[i][j]);
+			}
+		}
 
 		setTitle("Prova 1 - 2024/1");
 
@@ -129,46 +116,44 @@ public class Memory extends JFrame implements Observador {
 			int r = clicked.getRow();
 			int c = clicked.getColumn();
 			
-			cardController.virarCarta(r, c);
-			
 			int index = (r * COLUMNS) + c ;
-//			
-			ImageIcon tempImg = new ImageIcon("imagens/Card" + cardController.getCards()[index].getImgNum() + ".jpg");
+			
+			ImageIcon tempImg = new ImageIcon("imagens/Card" + cards[index].getImgNum() + ".jpg");
 			imgLabel[r][c].setIcon(tempImg);
-//
-//			// guarda as variaveis da primeira carta a ser virada
-//			if (isFirst) {
-//				compareCards = cards[index].getImgNum();
-//				holdCardRow = r;
-//				holdCardColumn = c;
-//				memButtons[holdCardRow][holdCardColumn].setEnabled(false);
-//				isFirst = false;
-//			} else {
-//				// cartas iguais
-//				if (compareCards == cards[index].getImgNum()) {
-//					win++;
-//					// encontrou todas entao fim de jogo
-//					if (win == COLUMNS) {
-//						JOptionPane.showMessageDialog(null, "Voc\u00EA venceu!");
-//						dispose();
-//
-//					} else {
-//						// encontrou um par entao desabilita para nao fazer mais pares
-//						JOptionPane.showMessageDialog(null, "Voc\u00EA encontrou um par!");
-//						cards[(holdCardRow * COLUMNS)+holdCardColumn].setCorrect(true);
-//						cards[index].setCorrect(true);
-//						memButtons[r][c].setEnabled(false);
-//					}
-//				} else {
-//					// cartas diferentes
-//					JOptionPane.showMessageDialog(null, "Gah! Erradas!");
-//					memButtons[holdCardRow][holdCardColumn].setEnabled(true);
-//					tempImg = versoCarta;
-//					imgLabel[r][c].setIcon(tempImg);
-//					imgLabel[holdCardRow][holdCardColumn].setIcon(tempImg);
-//				}
-//				isFirst = true;
-//			}
+
+			// guarda as variaveis da primeira carta a ser virada
+			if (isFirst) {
+				compareCards = cards[index].getImgNum();
+				holdCardRow = r;
+				holdCardColumn = c;
+				memButtons[holdCardRow][holdCardColumn].setEnabled(false);
+				isFirst = false;
+			} else {
+				// cartas iguais
+				if (compareCards == cards[index].getImgNum()) {
+					win++;
+					// encontrou todas entao fim de jogo
+					if (win == COLUMNS) {
+						JOptionPane.showMessageDialog(null, "Voc\u00EA venceu!");
+						dispose();
+
+					} else {
+						// encontrou um par entao desabilita para nao fazer mais pares
+						JOptionPane.showMessageDialog(null, "Voc\u00EA encontrou um par!");
+						cards[(holdCardRow * COLUMNS)+holdCardColumn].setCorrect(true);
+						cards[index].setCorrect(true);
+						memButtons[r][c].setEnabled(false);
+					}
+				} else {
+					// cartas diferentes
+					JOptionPane.showMessageDialog(null, "Gah! Erradas!");
+					memButtons[holdCardRow][holdCardColumn].setEnabled(true);
+					tempImg = versoCarta;
+					imgLabel[r][c].setIcon(tempImg);
+					imgLabel[holdCardRow][holdCardColumn].setIcon(tempImg);
+				}
+				isFirst = true;
+			}
 		}
 	}
 
@@ -197,34 +182,4 @@ public class Memory extends JFrame implements Observador {
 		Memory m = new Memory();
 		m.setVisible(true);
 	}
-
-	@Override
-	public void embaralhar() {
-		for (int i = 0; i < ROWS; i++) {
-			for (int j = 0; j < COLUMNS; j++) {
-				buildMemPanel(i, j);
-				add(memPanel[i][j]);
-			}
-		}
-		
-	}
-
-	@Override
-	public void virarPrimeiraCarta(int r, int c) {
-		memButtons[r][c].setEnabled(false);		
-	}
-
-	@Override
-	public void notificarVitoria() {
-		JOptionPane.showMessageDialog(null, "Voc\u00EA venceu!");
-		dispose();
-	}
-
-	@Override
-	public void notificarMatch(int r, int c) {
-		JOptionPane.showMessageDialog(null, "Voc\u00EA encontrou um par!");
-		memButtons[r][c].setEnabled(false);
-	}
-	
-	
 }
