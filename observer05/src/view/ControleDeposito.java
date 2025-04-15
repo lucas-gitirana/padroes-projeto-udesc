@@ -47,19 +47,17 @@ public class ControleDeposito extends javax.swing.JFrame implements Observer{
 	
 	private DepositoController depositoController;
 	
-    //private DepositoListModel depositoListModel; //!!!
+    private DepositoListModel depositoListModel;
     
     public ControleDeposito() {
-    	
     	depositoController = new DepositoController();
     	depositoController.addObserver(this);
     	
         initComponents();
         setLocationRelativeTo(null);
         
-//        this.depositoListModel = new DepositoListModel();
-//        jList1.setModel(depositoListModel);
-        
+        this.depositoListModel = new DepositoListModel();
+        jList1.setModel(depositoListModel);
     }
     
     private void initComponents() {
@@ -286,13 +284,13 @@ public class ControleDeposito extends javax.swing.JFrame implements Observer{
 
 	@Override
 	public void adicionouQuantidade(int qtd) {
-		jLabel6.setText("Adicionado " + qtd);
+		depositoListModel.addTexto("Adicionado " + qtd);
 		jLabel5.setText(String.valueOf(depositoController.getQuantidadeAtual()));
 	}
 
 	@Override
 	public void removeuQuantidade(int qtd) {
-		jLabel6.setText("Retirado " + qtd);
+		depositoListModel.addTexto("Retirado " + qtd);
 		jLabel5.setText(String.valueOf(depositoController.getQuantidadeAtual()));
 	}
 
