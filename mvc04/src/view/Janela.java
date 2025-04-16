@@ -20,13 +20,13 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import controle.Observador;
+import controle.Observer;
 import controle.PedidoController;
 import model.Pedido;
 import model.Produto;
 
 @SuppressWarnings("serial")
-public class Janela extends JFrame implements Observador{
+public class Janela extends JFrame implements Observer {
 
 	private JButton jbNovo;
 
@@ -46,8 +46,8 @@ public class Janela extends JFrame implements Observador{
 
 	private ItensTableModel itModel;
 	
-	// Controlador de pedidos
-	private PedidoController pedidoController;
+	//Controller
+	private PedidoController controller; 
 
 	class ItensTableModel extends AbstractTableModel {
 
@@ -67,19 +67,20 @@ public class Janela extends JFrame implements Observador{
 		
 		@Override
 		public int getRowCount() {
-			return pedidoController.getTabelaPedidos().size() + 1;
+			return controller.getTabelaPedidos().size() + 1;
 		}
 
 		@Override
 		public Object getValueAt(int rowIndex, int colIndex) {
-			if (rowIndex == pedidoController.getTabelaPedidos().size()) {
+			if (rowIndex == controller.getTabelaPedidos().size()) {
 				if (colIndex == 2) {
-					return pedidoController.calculaTotalPedido();
+					return controller.getTotalPedido();
+
 				} else {
 					return null;
 				}
 			} else {
-				Pedido p = pedidoController.getTabelaPedidos().get(rowIndex);
+				Pedido p = controller.getTabelaPedidos().get(rowIndex);
 				switch (colIndex) {
 				case 0:
 					return p.getProduto().getNome();
@@ -118,7 +119,7 @@ public class Janela extends JFrame implements Observador{
 			// Cells are by default rendered as a JLabel.
 			JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
 
-			if (row == pedidoController.getTabelaPedidos().size()) {
+			if (row == controller.getTabelaPedidos().size()) {
 				l.setFont(new Font(l.getFont().getFontName(), Font.BOLD, l.getFont().getSize()));
 			}
 			return l;
@@ -128,9 +129,9 @@ public class Janela extends JFrame implements Observador{
 
 	public Janela() {
 		
-		// Registramos a janela como observador do controller
-		pedidoController = new PedidoController();
-		pedidoController.addObservador(this);
+		//Instanciando controller e registrando observer
+		controller = new PedidoController();
+		controller.addObserver(this);
 		
 		setTitle("Prova 1 55PPR");
 		setSize(400, 300);
@@ -146,6 +147,7 @@ public class Janela extends JFrame implements Observador{
 	}
 
 	private void habilitarComponentes(boolean valor) {
+		
 		jbNovo.setEnabled(!valor);
 		jbAnterior.setEnabled(valor);
 		jbPosterior.setEnabled(valor);
@@ -166,10 +168,12 @@ public class Janela extends JFrame implements Observador{
 		nav.setLayout(new BorderLayout());
 		nav.setBorder(BorderFactory.createLineBorder(Color.black));
 
-		jpProdutos = new JPanel();		
-		
-		// Chamando controller para instanciar cada item de produto
-		pedidoController.carregaImagemProduto();
+		jpProdutos = new JPanel();
+		for (Produto p : controller.getTabelaProdutos()) {
+			Icon icon = new ImageIcon("imagens/" + p.getNome() + ".png");
+			JLabel jl = new JLabel(icon);
+			jpProdutos.add(jl);
+		}
 
 		cardLayout = new CardLayout();
 		jpProdutos.setLayout(cardLayout);
@@ -213,7 +217,7 @@ public class Janela extends JFrame implements Observador{
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				pedidoController.novo();
+				habilitarComponentes(true);
 			}
 		});
 
@@ -221,7 +225,7 @@ public class Janela extends JFrame implements Observador{
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				pedidoController.anterior();
+				controller.anterior();
 			}
 		});
 
@@ -229,7 +233,7 @@ public class Janela extends JFrame implements Observador{
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				pedidoController.posterior();
+				controller.posterior();
 			}
 		});
 
@@ -237,7 +241,7 @@ public class Janela extends JFrame implements Observador{
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				pedidoController.adicionarProdutoPedido();
+				controller.adicionar();
 			}
 		});
 
@@ -245,7 +249,7 @@ public class Janela extends JFrame implements Observador{
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				pedidoController.concluirPedido();
+				controller.concluir();
 			}
 		});
 	}
@@ -253,18 +257,6 @@ public class Janela extends JFrame implements Observador{
 	public static void main(String[] args) {
 		Janela j = new Janela();
 		j.setVisible(true);
-	}
-	
-	@Override
-	public void novoPedido() {
-		habilitarComponentes(true);		
-	}
-
-	@Override
-	public void inicializaProduto(Produto p) {
-		Icon icon = new ImageIcon("imagens/" + p.getNome() + ".png");
-		JLabel jl = new JLabel(icon);
-		this.jpProdutos.add(jl);
 	}
 
 	@Override
@@ -278,15 +270,15 @@ public class Janela extends JFrame implements Observador{
 	}
 
 	@Override
-	public void addProdutoPedido() {
+	public void adicionar() {
 		itModel.fireTableDataChanged();
 	}
 
 	@Override
-	public void concluirPedido() {
+	public void concluir() {
 		itModel.fireTableDataChanged();
 		cardLayout.first(jpProdutos);
 		habilitarComponentes(false);
 	}
-	
+
 }
