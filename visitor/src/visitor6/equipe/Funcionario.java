@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import visitor5.visitor.AtendimentoVisitor;
+import visitor6.visitor.Visitor;
+
 /*
  * O que jah existe na classe nao pode ser modificado (alterado).
  * Mas podes adicionar novas funcionalidades.
@@ -40,6 +43,11 @@ public class Funcionario {
 	public void setProjetoAtual(String projeto) {
 		this.projetoAtual = projeto;
 	}
+	
+	//Método accept (concreto por enquanto)
+		public void accept(Visitor visitor) throws Exception {
+			visitor.visitProjeto(this);
+		}
 	
 	@Override
 	public String toString() {

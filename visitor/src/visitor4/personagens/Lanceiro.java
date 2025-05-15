@@ -10,7 +10,7 @@ public class Lanceiro extends Personagem {
 
 	@Override
 	public void accept(AtaqueVisitor visitor) throws Exception {
-		visitor.visitLanceiro(this);	
+		visitor.visitLanceiro(this);
 	}
 
 }

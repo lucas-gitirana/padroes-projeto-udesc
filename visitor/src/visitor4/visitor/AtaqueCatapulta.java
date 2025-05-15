@@ -18,6 +18,7 @@ public class AtaqueCatapulta extends AtaqueVisitor {
 
 	@Override
 	public void visitCatapulta(Catapulta catapulta) {
+		if (getPersonagem() == catapulta) return; 
 		catapulta.setPontoVida(catapulta.getPontoVida() - (getPersonagem().getForcaAtaque() + 2));
 	}
 
