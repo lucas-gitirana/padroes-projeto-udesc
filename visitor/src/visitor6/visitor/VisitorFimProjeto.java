@@ -11,8 +11,9 @@ public class VisitorFimProjeto extends Visitor {
 
 	@Override
 	public void visitProjeto(Funcionario func) {
-		// TODO Auto-generated method stub
-		
+		if (func.getProjetoAtual() != null && func.getProjetoAtual().equalsIgnoreCase(getProjeto().getNome())) {
+			func.setProjetoAtual(null);
+		}
 	}
 
 }

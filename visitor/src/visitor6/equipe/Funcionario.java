@@ -44,14 +44,15 @@ public class Funcionario {
 		this.projetoAtual = projeto;
 	}
 	
-	//Método accept (concreto por enquanto)
-		public void accept(Visitor visitor) throws Exception {
-			visitor.visitProjeto(this);
-		}
+	//Mï¿½todo accept (concreto por enquanto)
+	public void accept(Visitor visitor) throws Exception {
+		visitor.visitProjeto(this);
+	}
 	
 	@Override
 	public String toString() {
-		return nome;
+		return "Funcionario [nome=" + nome + ", funcoes=" + funcoes + ", salario=" + salario + ", projetoAtual="
+				+ projetoAtual + "]";
 	}
 
 }

@@ -12,4 +12,9 @@ public abstract class Visitor {
 	}
 	
 	public abstract void visitProjeto(Funcionario func);
+
+	public Projeto getProjeto() {
+		return projeto;
+	}
+	
 }
