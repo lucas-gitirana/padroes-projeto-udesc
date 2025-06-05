@@ -55,7 +55,6 @@ public class Artigo {
 	public float getMediaCorrecao() {
 		return notasCorrecaoRevisores.stream().mapToInt(Integer::intValue).sum() / getQuantasRevisoesCorrecao();
 	}
-
 	
 	public String getTitulo() {
 		return titulo;

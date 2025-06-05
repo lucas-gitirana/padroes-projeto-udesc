@@ -37,7 +37,7 @@ public class Sistema {
 		a2.correcoesRevisadas(3);
 		a2.correcoesRevisadas(3);
 		
-		a2.corrigido(); // mais algumas correcoes
+        a2.corrigido(); // mais algumas correcoes
 		a2.correcoesRevisadas(4);
 		a2.correcoesRevisadas(3); // Reprovado : ainda nao deu dessa vez
 		// os autores sao insistentes

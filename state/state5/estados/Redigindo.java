@@ -11,7 +11,13 @@ public class Redigindo extends EstadoArtigo {
 	
 	@Override
 	public void submeter() throws Exception {
-		// TODO artigo.setEstado(new Submetido(artigo));
+		 artigo.setEstado(new Submetido(artigo));
+	}
+
+	@Override
+	public void revisao(int nota) throws Exception {
+		artigo.addNotaCorrecaoRevisor(nota);
+		artigo.setEstado(new Revisando(artigo));	
 	}
 
 }
