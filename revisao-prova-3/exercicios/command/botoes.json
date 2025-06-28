@@ -1,0 +1,7 @@
+{"botoes":[
+  {"type": "Undo"},
+  {"type": "Circ"},
+  {"type": "Quad"},
+  {"type": "separador"},
+  {"type": "Redo"}
+  ]}
