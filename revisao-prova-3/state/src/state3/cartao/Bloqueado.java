@@ -15,9 +15,4 @@ public class Bloqueado extends CartaoEstado {
     public void fazerPagamento() throws Exception {
         throw new Exception("Não pode fazer pagamento. CARTÃO BLOQUEADO");
     }
-
-    @Override
-    public void proxEstado() throws Exception {
-        throw new Exception("Não pode mudar de estado");
-    }
 }

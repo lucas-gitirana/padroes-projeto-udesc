@@ -21,6 +21,4 @@ public abstract class CartaoEstado {
 
 	public abstract void fazerPagamento() throws Exception;
 
-	public abstract void proxEstado() throws Exception;
-
 }

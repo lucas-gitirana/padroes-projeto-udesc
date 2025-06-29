@@ -14,12 +14,6 @@ public class ProntoParaPagamento extends CartaoEstado {
 	@Override
 	public void fazerPagamento() throws Exception {
 		// pagamento feito
-//		this.getCartao().setEstado(new ProntoParaUsar(getCartao()));
-		proxEstado();
-	}
-
-	@Override
-	public void proxEstado() throws Exception {
 		this.getCartao().setEstado(new ProntoParaUsar(getCartao()));
 	}
 
